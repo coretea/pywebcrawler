@@ -41,7 +41,13 @@ class Scraper:
     def create_items(output_list):
         files_list = []
         for i in range(1, len(output_list)):
-            files_list.append( FirmwareFile(output[i][0], output[i][1], output[i][2], output[i][3], output[i][4], output[i][5]))
+            # the strip function helps to keep the text simple without any unicode adding spaces and tabs
+            files_list.append(FirmwareFile(output[i][0].strip(' \t\n\r'),
+             output[i][1].strip(' \t\n\r'),
+             output[i][2].strip(' \t\n\r'),
+             output[i][3].strip(' \t\n\r'),
+             output[i][4].strip(' \t\n\r'),
+             output[i][5].strip(' \t\n\r')))
         return files_list
 
 class db_access:
