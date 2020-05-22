@@ -16,8 +16,7 @@ class FirmwareFile:
         self.android_v = android_v
         self.author = author
 
-    def json(self):
-        pass
+
 
 class Scraper:
     'This class used for scraping the HTML code for items and parse them'
@@ -26,7 +25,6 @@ class Scraper:
 
     #----------functions------
     def parser(self):
-
         isDone = False
         # http url manager
         http = urllib3.PoolManager()
@@ -52,7 +50,7 @@ class Scraper:
             output.extend(output_rows)
             # gets the next page. if there isnt one, return True
             isDone = self.get_next_page(page_soup)
-            
+
         return output
 
     def get_next_page(self, page_soup):
@@ -83,10 +81,22 @@ class db_access:
     mydb = client["db_data"]
     metadata_collection = mydb["metadata"]
 
+    def itemsToJson(self, items_list):
+        for i in range(0, len(items_list)):
+            items_list[i] = json.dumps(items_list[i].__dict__)
+
+
+    def upload_items(self, items_list):
+        self.metadata_collection.insert_many(items_list)
+
 
 #testing
 scraper = Scraper()
+db = db_access()
 output = scraper.parser()
 files = scraper.create_items(output)
 print(len(files))
 print(files[1].name)
+db.itemsToJson(files)
+print(files[0])
+#db.upload_items()
