@@ -81,9 +81,9 @@ class db_access:
     mydb = client["db_data"]
     metadata_collection = mydb["metadata"]
 
-    def itemsToJson(self, items_list):
+    def itemsToDicts(self, items_list):
         for i in range(0, len(items_list)):
-            items_list[i] = json.dumps(items_list[i].__dict__)
+            items_list[i] = items_list[i].__dict__
 
 
     def upload_items(self, items_list):
@@ -97,6 +97,6 @@ output = scraper.parser()
 files = scraper.create_items(output)
 print(len(files))
 print(files[1].name)
-db.itemsToJson(files)
+db.itemsToDicts(files)
 print(files[0])
-#db.upload_items()
+db.upload_items(files)
