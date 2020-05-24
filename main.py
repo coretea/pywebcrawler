@@ -87,7 +87,17 @@ class db_access:
 
 
     def upload_items(self, items_list):
-        self.metadata_collection.insert_many(items_list)
+        for item in items_list:
+            if not self.does_exist(item):
+                self.metadata_collection.insert_one(item)
+
+
+    def does_exist(self, item_dict):
+        if self.metadata_collection.count_documents(item_dict, limit = 1) != 0:
+            return True
+        return False
+
+
 
 
 #testing
