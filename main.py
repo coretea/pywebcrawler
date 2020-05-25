@@ -72,11 +72,11 @@ class Scraper:
         this function gets the page soup (scraped html)
         and searches for the next page url
         """
-         next = page_soup.find("a", {"title":"Go to next page"})
-         if (next == None):
-             return True
-         self.url = sys.argv[1] + "/"+ next['href']
-         return False
+        next = page_soup.find("a", {"title":"Go to next page"})
+        if (next == None):
+            return True
+        self.url = sys.argv[1] + "/"+ next['href']
+        return False
 
     def create_items(self, output_list):
         """
@@ -103,11 +103,11 @@ class Scraper:
         fileurl = sys.argv[1] + "/"+ url
         page_html = self.http.request('GET', fileurl)
         soup = BeautifulSoup(page_html.data, "html.parser")
-        span = soup.find("span", {"class":"file"})
-        if span is None:
-            return "none" # no download url found for entry
-        filetab = span.find("a", href=True)
-        downloadurl = filetab['href']
+        allhrefs = soup.findAll("a", href=True)
+        downloadurl = "none"
+        for href in allhrefs:
+            if "http://www.rockchipfirmware.com/sites/default/files/" in href['href']:
+                downloadurl = href['href']
         return downloadurl
 
 
