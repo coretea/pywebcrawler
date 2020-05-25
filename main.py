@@ -1,9 +1,22 @@
 from bs4 import BeautifulSoup
-from requests import urllib3, Request
+from requests import urllib3, Request, get
 import pymongo
 import sys
 import json
+import os
 
+HELP_MSG = "USAGE: \"python3 main.py [OPTIONS] [URL]\"\nOPTIONS:\n-s for scanning and updating DB\n-d for downloading a certain file from DB.\n-a for running a full scan and then download a file."
+
+def check_arguments():
+    if len(sys.argv) != 3:
+        print("Invalid Arguments.\n")
+        print(HELP_MSG)
+        exit()
+
+    if (sys.argv[1] != "-s" and sys.argv[1] != "-d" and sys.argv[1] != "-a"):
+        print("Invalid option\n")
+        print(HELP_MSG)
+        exit()
 
 
 # --------- Classes-------
@@ -20,13 +33,14 @@ class FirmwareFile:
         self.download_URL = download_URL
 
 
+
 class Scraper:
     'This class used for scraping the HTML code for items and parse them'
-    #-----------vars-----------
-    url = sys.argv[1] + "/firmware-downloads" # first page of firmware files. gets the main url from console argument
-        # http url manager
-    http = urllib3.PoolManager()
     #----------functions------
+    def __init__(self):
+        self.url = sys.argv[2] + "/firmware-downloads"
+        self.http = urllib3.PoolManager()
+
     def parser(self):
         """
         this function parsing the entire website using multiple functions
@@ -100,7 +114,7 @@ class Scraper:
         """
         this function gets a url ending to the file and searches for download file links
         """
-        fileurl = sys.argv[1] + "/"+ url
+        fileurl = sys.argv[2] + "/"+ url
         page_html = self.http.request('GET', fileurl)
         soup = BeautifulSoup(page_html.data, "html.parser")
         allhrefs = soup.findAll("a", href=True)
@@ -109,6 +123,9 @@ class Scraper:
             if "http://www.rockchipfirmware.com/sites/default/files/" in href['href']:
                 downloadurl = href['href']
         return downloadurl
+
+    def download_file(self, url):
+        os.system('wget ' + url)
 
 
 class db_access:
@@ -144,13 +161,76 @@ class db_access:
             return True
         return False
 
+    def get_models(self, brand):
+        items = self.metadata_collection.find({"brand": brand})
+        num_items = self.metadata_collection.count_documents({"brand": brand})
+        if num_items == 0:
+            print("No items associated with this brand")
+            return None
+        models = []
+        for item in items:
+            if item['model'] not in models:
+                models.append(item['model'])
+        return models
+
+    def get_names(self, model):
+        items = self.metadata_collection.find({"model": model})
+        num_items = self.metadata_collection.count_documents({"model": model})
+        if num_items == 0:
+            print("No items associated with this file name")
+            return None
+        names = []
+        for item in items:
+            if item['name'] not in items:
+                names.append(item['name'])
+        return names
+
+    def get_download_by_name(self, name):
+        items = self.metadata_collection.find({"name": name})
+        for item in items:
+            return item['download_URL']
 
 
+def main():
+    check_arguments()
+    scraper = Scraper()
+    db = db_access()
+    flag = True
+    if sys.argv[1] == "-s":
+        output = scraper.parser()
+        files = scraper.create_items(output)
+        db.itemsToDicts(files)
+        db.upload_items(files)
+    # if user chose downloading options
+    if sys.argv[1] == "-d":
+        while(flag):
+            brand = input("\nEnter brand name(Case-Sensitive): ")
+            models = db.get_models(brand)
+            if models == None:
+                continue
+            print("Choose a model: ")
+            for item in models:
+                print(str(models.index(item))+") "+item)
+            model_choice = input("\nChoose a model(by number): ")
+            if int(model_choice) > len(models) or  int(model_choice) < 0:
+                print("Invalid choice.")
+                continue
+            names = db.get_names(models[int(model_choice)])
+            if names == None:
+                continue
+            print("Choose a file: ")
+            for item in names:
+                print(str(names.index(item))+") "+item)
+            file_choice = input("\nChoose a file(by number): ")
+            if int(file_choice) > len(names) or  int(file_choice) < 0:
+                print("Invalid choice.")
+                continue
+            downloadurl = db.get_download_by_name(names[int(file_choice)])
+            if downloadurl == "none":
+                print("There is no download available for this file. Sorry :(")
+                exit()
+            print("Download Started!")
+            scraper.download_file(downloadurl)
 
-#testing
-scraper = Scraper()
-db = db_access()
-output = scraper.parser()
-files = scraper.create_items(output)
-db.itemsToDicts(files)
-db.upload_items(files)
+if __name__ == "__main__":
+    main()
