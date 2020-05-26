@@ -14,7 +14,7 @@ Another main feature is downloading Firmware files to your device straight from 
 This software is made to work with Ubuntu 18.04.X and up, Python 3.6 and up.
 
 
-###  Usagwe
+###  Usage
 
 This software runs from the shell command line on your Ubuntu machine.
 The usage should look like that:
