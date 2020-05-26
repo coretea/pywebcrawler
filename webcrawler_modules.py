@@ -174,7 +174,6 @@ class db_access:
         """
         items = self.metadata_collection.find({"model": model})
         num_items = self.metadata_collection.count_documents({"model": model})
-        print(num_items)
         if num_items == 0:
             print("No items associated with this file name")
             return None
