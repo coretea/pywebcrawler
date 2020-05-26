@@ -19,6 +19,11 @@ def check_arguments():
         exit()
 
 
+check_arguments()
+scraper = Scraper()
+db = db_access()
+
+
 def download_option():
     """
     this function is for the download file option.
@@ -71,10 +76,8 @@ def download_option():
         scraper.download_file(downloadurl)
 
 
+
 def main():
-    check_arguments()
-    scraper = Scraper()
-    db = db_access()
     if sys.argv[1] == "-s":
         # if the user chose scan option
         output = scraper.parser() # scanning site
