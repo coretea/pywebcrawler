@@ -3,7 +3,11 @@ import sys
 
 HELP_MSG = "USAGE: \"python3 main.py [OPTIONS] [URL]\"\nOPTIONS:\n-s for scanning and updating DB\n-d for downloading a certain file from DB."
 
+
 def check_arguments():
+    """
+    this function checks the validality of arguments inserted when running main.pys
+    """
     if len(sys.argv) != 3:
         print("Invalid Arguments.\n")
         print(HELP_MSG)

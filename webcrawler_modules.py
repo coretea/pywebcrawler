@@ -112,6 +112,9 @@ class Scraper:
         return downloadurl
 
     def download_file(self, url):
+        """
+        this function downloads file using unix command 'wget'
+        """
         os.system('wget ' + url)
 
 
@@ -151,6 +154,9 @@ class db_access:
         return False
 
     def get_models(self, brand):
+        """
+        this function fetches data from db based on chosen brand (fetching model list)
+        """
         items = self.metadata_collection.find({"brand": brand})
         num_items = self.metadata_collection.count_documents({"brand": brand})
         if num_items == 0:
@@ -163,6 +169,9 @@ class db_access:
         return models
 
     def get_names(self, model):
+        """
+        this function fetches data from db based on chosen model (fetching file list)
+        """
         items = self.metadata_collection.find({"model": model})
         num_items = self.metadata_collection.count_documents({"model": model})
         if num_items == 0:
@@ -175,6 +184,9 @@ class db_access:
         return names
 
     def get_download_by_name(self, name):
+        """
+        this function fetches data from db based on chosen brand (fetching download url based on file name)
+        """
         items = self.metadata_collection.find({"name": name})
         for item in items:
             return item['download_URL']
