@@ -64,7 +64,7 @@ def download_option():
             print("Choose a file: ")
             for item in names:
                 print(str(names.index(item))+") "+item)
-                file_choice = input("\nChoose a file(by number): ")
+            file_choice = input("\nChoose a file(by number): ")
             if int(file_choice) > len(names) or  int(file_choice) < 0:
                 print("Invalid choice.")
                 continue
