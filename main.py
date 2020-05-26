@@ -18,7 +18,11 @@ def check_arguments():
         print(HELP_MSG)
         exit()
 
+    if(sys.argv[2] != "www.rockchipfirmware.com"):
+        print("Sorry, this website is not supported")
+        exit()
 
+# global variables
 check_arguments()
 scraper = Scraper()
 db = db_access()
